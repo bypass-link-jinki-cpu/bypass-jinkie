@@ -156,6 +156,15 @@
         try {
             let parsed = new URL(url);
             
+            // Extract UUID from Jinkie flow path and format as key:[UUID]
+            if (parsed.pathname.includes("/flow/")) {
+                let parts = parsed.pathname.split("/flow/");
+                if (parts.length > 1 && parts[1]) {
+                    let flowId = parts[1].split("/")[0];
+                    return { type: 'text', content: "key:" + flowId };
+                }
+            }
+            
             let destination = parsed.searchParams.get('u') || 
                               parsed.searchParams.get('url') || 
                               parsed.searchParams.get('destination') ||
@@ -166,11 +175,7 @@
                 return { type: 'url', content: decodeURIComponent(destination) };
             }
             
-            if (parsed.pathname.startsWith("/flow/")) {
-                let flowId = parsed.pathname.split("/")[2];
-                return { type: 'url', content: "https://example.com/resolved/" + flowId };
-            }
-            
+            // If it's a standard URL, treat it as a link requiring an Open button
             return { type: 'url', content: url };
         } catch (e) {
             return { type: 'text', content: "Invalid URL format." };
@@ -204,7 +209,7 @@
                 frame.innerText = res.content;
                 navigator.clipboard.writeText(res.content).then(() => {
                     toast.style.color = "#28a745";
-                    toast.innerText = "Key/Result copied automatically!";
+                    toast.innerText = "Key copied automatically!";
                     setTimeout(() => { toast.innerText = ""; }, 2500);
                 }).catch(() => {});
             }
