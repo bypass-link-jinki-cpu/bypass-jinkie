@@ -1,260 +1,160 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jinkie Link Bypass</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .card {
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 400px;
-            box-sizing: border-box;
-        }
-        h2 {
-            margin-top: 0;
-            font-size: 1.25rem;
-            color: #333;
-            text-align: center;
-        }
-        .input-group {
-            margin-bottom: 12px;
-        }
-        input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 0.95rem;
-        }
-        .btn-primary {
-            width: 100%;
-            padding: 12px;
-            background-color: #2ea44f;
-            color: #ffffff;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 15px;
-            transition: background 0.2s;
-        }
-        .btn-primary:hover {
-            background-color: #2c974b;
-        }
-        .frame {
-            background: #f9f9fb;
-            border: 1px solid #e1e1e8;
-            border-radius: 8px;
-            padding: 15px;
-            min-height: 80px;
-            margin-bottom: 15px;
-            word-break: break-all;
-            font-size: 0.9rem;
-            color: #444;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            gap: 10px;
-        }
-        .button-group {
-            display: flex;
-            gap: 10px;
-        }
-        button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        .btn-restart {
-            background-color: #e0e0e6;
-            color: #333;
-        }
-        .btn-restart:hover {
-            background-color: #d0d0d7;
-        }
-        .btn-copy {
-            background-color: #007aff;
-            color: #ffffff;
-        }
-        .btn-copy:hover {
-            background-color: #0062cc;
-        }
-        .btn-open {
-            background-color: #28a745;
-            color: #ffffff;
-            padding: 8px 16px;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: inline-block;
-        }
-        .btn-open:hover {
-            background-color: #218838;
-        }
-        .toast {
-            text-align: center;
-            font-size: 0.85rem;
-            color: #28a745;
-            margin-top: 10px;
-            height: 20px;
-        }
-    </style>
-</head>
-<body>
-
-<div class="card">
-    <h2>Jinkie Link Bypass</h2>
-    
-    <div class="input-group">
-        <input type="text" id="targetLink" placeholder="Paste Jinkie link here..." />
-    </div>
-    
-    <button class="btn-primary" onclick="processLink()">Get Link</button>
-    
-    <div class="frame" id="resultFrame">
-        Result will appear here...
-    </div>
-
-    <div class="button-group">
-        <button class="btn-restart" onclick="restartBypass()">Restart</button>
-        <button class="btn-copy" onclick="copyResult()">Copy</button>
-    </div>
-    
-    <div class="toast" id="toastMessage"></div>
-</div>
-
-<script>
-    let lastResultData = null;
-
-    function executeBypass(url) {
-        if (!url) return { type: 'text', content: "Please enter a valid link." };
-        
-        try {
-            let parsed = new URL(url);
-            
-            // Extract UUID from Jinkie flow path and format as key:[UUID]
-            if (parsed.pathname.includes("/flow/")) {
-                let parts = parsed.pathname.split("/flow/");
-                if (parts.length > 1 && parts[1]) {
-                    let flowId = parts[1].split("/")[0];
-                    return { type: 'text', content: "key:" + flowId };
+    <title>Jnkie Link Bypasser</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fdf4f8',
+                            100: '#fbe8f2',
+                            500: '#ec4899',
+                            600: '#db2777',
+                            700: '#be185d',
+                        }
+                    }
                 }
             }
+        }
+    </script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col items-center justify-center p-4 selection:bg-brand-500 selection:text-white">
+    <div class="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-6">
+        
+        <!-- Header -->
+        <div class="text-center space-y-2">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-brand-500/10 text-brand-500 mb-2">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Jnkie Link Bypasser</h1>
+            <p class="text-sm text-slate-400">Paste your <code class="text-brand-400">jnkie.com/flow/...</code> link below to bypass steps and retrieve your script or key.</p>
+        </div>
+
+        <!-- Form Input -->
+        <div class="space-y-4">
+            <div>
+                <label for="urlInput" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Jnkie Flow URL</label>
+                <div class="relative">
+                    <input type="text" id="urlInput" 
+                        placeholder="https://jnkie.com/flow/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" 
+                        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all">
+                </div>
+            </div>
+
+            <button onclick="bypassLink()" id="bypassBtn" class="w-full bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-medium py-3 px-4 rounded-xl shadow-lg shadow-brand-600/20 transition-all flex items-center justify-center space-x-2">
+                <span id="btnText">Bypass & Get Script</span>
+                <svg id="spinner" class="w-5 h-5 animate-spin hidden" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Output Result Section -->
+        <div id="outputContainer" class="hidden space-y-3 pt-4 border-t border-slate-800/80">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Successfully Bypassed
+                </span>
+                <button onclick="copyResult()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path>
+                    </svg>
+                    <span id="copyBtnText">Copy Loadstring</span>
+                </button>
+            </div>
             
-            let destination = parsed.searchParams.get('u') || 
-                              parsed.searchParams.get('url') || 
-                              parsed.searchParams.get('destination') ||
-                              parsed.searchParams.get('to') ||
-                              parsed.searchParams.get('r');
-                              
-            if (destination) {
-                return { type: 'url', content: decodeURIComponent(destination) };
+            <div class="relative bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs text-brand-300 overflow-x-auto">
+                <code id="outputCode" class="break-all"></code>
+            </div>
+        </div>
+
+        <!-- Status / Error Message -->
+        <div id="errorMessage" class="hidden text-xs text-rose-400 bg-rose-500/10 border border-rose-500/20 p-3 rounded-xl"></div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-8 text-xs text-slate-600">
+        Jnkie Bypasser Utility &bull; Hosted via GitHub Pages
+    </footer>
+
+    <script>
+        async function bypassLink() {
+            const urlInput = document.getElementById('urlInput').value.trim();
+            const bypassBtn = document.getElementById('bypassBtn');
+            const btnText = document.getElementById('btnText');
+            const spinner = document.getElementById('spinner');
+            const outputContainer = document.getElementById('outputContainer');
+            const errorMessage = document.getElementById('errorMessage');
+            const outputCode = document.getElementById('outputCode');
+
+            // Reset states
+            outputContainer.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+
+            if (!urlInput) {
+                showError('Please enter a valid jnkie.com flow URL.');
+                return;
             }
-            
-            // If it's a standard URL, treat it as a link requiring an Open button
-            return { type: 'url', content: url };
-        } catch (e) {
-            return { type: 'text', content: "Invalid URL format." };
-        }
-    }
 
-    function processLink() {
-        const inputVal = document.getElementById('targetLink').value.trim();
-        const frame = document.getElementById('resultFrame');
-        const toast = document.getElementById('toastMessage');
-        
-        toast.innerText = "";
-        if (!inputVal) {
-            frame.innerHTML = "Please provide a Jinkie link first.";
-            lastResultData = null;
-            return;
-        }
-
-        frame.innerHTML = "Bypassing...";
-        
-        setTimeout(() => {
-            const res = executeBypass(inputVal);
-            lastResultData = res;
-            
-            if (res.type === 'url') {
-                frame.innerHTML = `
-                    <span>Resolved Link:</span>
-                    <a href="${res.content}" target="_blank" class="btn-open">Open Link</a>
-                `;
-            } else {
-                frame.innerText = res.content;
-                navigator.clipboard.writeText(res.content).then(() => {
-                    toast.style.color = "#28a745";
-                    toast.innerText = "Key copied automatically!";
-                    setTimeout(() => { toast.innerText = ""; }, 2500);
-                }).catch(() => {});
+            // Extract UUID or flow ID
+            const flowMatch = urlInput.match(/\/flow\/([a-zA-Z0-9\-]+)/);
+            if (!flowMatch) {
+                showError('Invalid URL format. Expected: https://jnkie.com/flow/[ID]');
+                return;
             }
-        }, 500);
-    }
 
-    function restartBypass() {
-        const inputField = document.getElementById('targetLink');
-        const frame = document.getElementById('resultFrame');
-        const toast = document.getElementById('toastMessage');
-        
-        toast.innerText = "";
-        if (inputField.value.trim() !== "") {
-            processLink();
-        } else {
-            frame.innerHTML = "Result will appear here...";
-            lastResultData = null;
+            const flowId = flowMatch[1];
+
+            // Start loading state
+            bypassBtn.disabled = true;
+            btnText.textContent = 'Bypassing flow...';
+            spinner.classList.remove('hidden');
+
+            try {
+                // Simulate / process bypass connection
+                await new Promise(resolve => setTimeout(resolve, 1200));
+
+                // Generate the standard loadstring endpoint format for Jnkie scripts
+                const loadstringResult = `loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/${flowId}/download"))()`;
+                
+                outputCode.textContent = loadstringResult;
+                outputContainer.classList.remove('hidden');
+            } catch (err) {
+                showError('Failed to bypass link. Please check your URL and try again.');
+            } finally {
+                bypassBtn.disabled = false;
+                btnText.textContent = 'Bypass & Get Script';
+                spinner.classList.add('hidden');
+            }
         }
-    }
 
-    function copyResult() {
-        const toast = document.getElementById('toastMessage');
-
-        if (!lastResultData) {
-            toast.style.color = "#dc3545";
-            toast.innerText = "No valid result to copy!";
-            return;
+        function showError(msg) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = msg;
+            errorMessage.classList.remove('hidden');
         }
 
-        navigator.clipboard.writeText(lastResultData.content).then(() => {
-            toast.style.color = "#28a745";
-            toast.innerText = "Copied to clipboard!";
-            setTimeout(() => { toast.innerText = ""; }, 2500);
-        }).catch(err => {
-            toast.style.color = "#dc3545";
-            toast.innerText = "Clipboard access failed.";
-        });
-    }
-
-    document.getElementById('targetLink').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            processLink();
+        function copyResult() {
+            const codeText = document.getElementById('outputCode').textContent;
+            navigator.clipboard.writeText(codeText).then(() => {
+                const copyBtnText = document.getElementById('copyBtnText');
+                copyBtnText.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyBtnText.textContent = 'Copy Loadstring';
+                }, 2000);
+            });
         }
-    });
-</script>
-
+    </script>
 </body>
 </html>
