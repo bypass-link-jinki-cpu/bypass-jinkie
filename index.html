@@ -68,9 +68,11 @@
             font-size: 0.9rem;
             color: #444;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
+            gap: 10px;
         }
         .button-group {
             display: flex;
@@ -99,6 +101,19 @@
         }
         .btn-copy:hover {
             background-color: #0062cc;
+        }
+        .btn-open {
+            background-color: #28a745;
+            color: #ffffff;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .btn-open:hover {
+            background-color: #218838;
         }
         .toast {
             text-align: center;
@@ -133,19 +148,13 @@
 </div>
 
 <script>
+    let lastResultData = null;
+
     function executeBypass(url) {
-        if (!url) return "Please enter a valid link.";
+        if (!url) return { type: 'text', content: "Please enter a valid link." };
         
         try {
             let parsed = new URL(url);
-            
-            // Specifically parse Jnkie flow paths (e.g., /flow/uuid)
-            if (parsed.hostname.includes("jnkie") && parsed.pathname.startsWith("/flow/")) {
-                let flowId = parsed.pathname.split("/")[2];
-                // Note: Real Jinkie flows are validated server-side. 
-                // If you are connecting an external bypass API or processing script, handle the flowId here:
-                return "https://api.jnkie.com/api/v2/resolve/" + flowId;
-            }
             
             let destination = parsed.searchParams.get('u') || 
                               parsed.searchParams.get('url') || 
@@ -154,12 +163,17 @@
                               parsed.searchParams.get('r');
                               
             if (destination) {
-                return decodeURIComponent(destination);
+                return { type: 'url', content: decodeURIComponent(destination) };
             }
             
-            return "https://resolved-destination.com/" + encodeURIComponent(parsed.pathname);
+            if (parsed.pathname.startsWith("/flow/")) {
+                let flowId = parsed.pathname.split("/")[2];
+                return { type: 'url', content: "https://example.com/resolved/" + flowId };
+            }
+            
+            return { type: 'url', content: url };
         } catch (e) {
-            return "Invalid URL format.";
+            return { type: 'text', content: "Invalid URL format." };
         }
     }
 
@@ -170,15 +184,30 @@
         
         toast.innerText = "";
         if (!inputVal) {
-            frame.innerText = "Please provide a Jinkie link first.";
+            frame.innerHTML = "Please provide a Jinkie link first.";
+            lastResultData = null;
             return;
         }
 
-        frame.innerText = "Bypassing...";
+        frame.innerHTML = "Bypassing...";
         
         setTimeout(() => {
-            const finalResult = executeBypass(inputVal);
-            frame.innerText = finalResult;
+            const res = executeBypass(inputVal);
+            lastResultData = res;
+            
+            if (res.type === 'url') {
+                frame.innerHTML = `
+                    <span>Resolved Link:</span>
+                    <a href="${res.content}" target="_blank" class="btn-open">Open Link</a>
+                `;
+            } else {
+                frame.innerText = res.content;
+                navigator.clipboard.writeText(res.content).then(() => {
+                    toast.style.color = "#28a745";
+                    toast.innerText = "Key/Result copied automatically!";
+                    setTimeout(() => { toast.innerText = ""; }, 2500);
+                }).catch(() => {});
+            }
         }, 500);
     }
 
@@ -191,22 +220,21 @@
         if (inputField.value.trim() !== "") {
             processLink();
         } else {
-            frame.innerText = "Result will appear here...";
+            frame.innerHTML = "Result will appear here...";
+            lastResultData = null;
         }
     }
 
     function copyResult() {
-        const frame = document.getElementById('resultFrame');
-        const textToCopy = frame.innerText;
         const toast = document.getElementById('toastMessage');
 
-        if (!textToCopy || textToCopy.includes("Result will appear") || textToCopy.includes("Bypassing") || textToCopy.includes("Please")) {
+        if (!lastResultData) {
             toast.style.color = "#dc3545";
             toast.innerText = "No valid result to copy!";
             return;
         }
 
-        navigator.clipboard.writeText(textToCopy).then(() => {
+        navigator.clipboard.writeText(lastResultData.content).then(() => {
             toast.style.color = "#28a745";
             toast.innerText = "Copied to clipboard!";
             setTimeout(() => { toast.innerText = ""; }, 2500);
