@@ -138,6 +138,15 @@
         
         try {
             let parsed = new URL(url);
+            
+            // Specifically parse Jnkie flow paths (e.g., /flow/uuid)
+            if (parsed.hostname.includes("jnkie") && parsed.pathname.startsWith("/flow/")) {
+                let flowId = parsed.pathname.split("/")[2];
+                // Note: Real Jinkie flows are validated server-side. 
+                // If you are connecting an external bypass API or processing script, handle the flowId here:
+                return "https://api.jnkie.com/api/v2/resolve/" + flowId;
+            }
+            
             let destination = parsed.searchParams.get('u') || 
                               parsed.searchParams.get('url') || 
                               parsed.searchParams.get('destination') ||
@@ -215,5 +224,4 @@
 </script>
 
 </body>
-  </html>
-  
+</html>
